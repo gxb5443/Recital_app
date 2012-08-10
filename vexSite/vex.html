@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>VexTab Tutorial!</title>
+
+ <link href='http://fonts.googleapis.com/css?family=OFL+Sorts+Mill+Goudy+TT|Yanone+Kaffeesatz|Tangerine'
+   rel='stylesheet' type='text/css'>
+  <link href="/scripts/vexflow/tabdiv/style.css" media="screen" rel="Stylesheet"
+    type="text/css" />
+
+  <!-- VexFlow Uncompiled Sources -->
+  <script src="/scripts/vexflow/src/header.js"></script>
+  <script src="/scripts/vexflow/src/vex.js"></script>
+  <script src="/scripts/vexflow/src/flow.js"></script>
+  <script src="/scripts/vexflow/src/tables.js"></script>
+  <script src="/scripts/vexflow/src/fonts/vexflow_font.js"></script>
+  <script src="/scripts/vexflow/src/glyph.js"></script>
+  <script src="/scripts/vexflow/src/stave.js"></script>
+  <script src="/scripts/vexflow/src/staveconnector.js"></script>
+  <script src="/scripts/vexflow/src/tabstave.js"></script>
+  <script src="/scripts/vexflow/src/tickcontext.js"></script>
+  <script src="/scripts/vexflow/src/tickable.js"></script>
+  <script src="/scripts/vexflow/src/note.js"></script>
+  <script src="/scripts/vexflow/src/barnote.js"></script>
+  <script src="/scripts/vexflow/src/ghostnote.js"></script>
+  <script src="/scripts/vexflow/src/stavenote.js"></script>
+  <script src="/scripts/vexflow/src/tabnote.js"></script>
+  <script src="/scripts/vexflow/src/beam.js"></script>
+  <script src="/scripts/vexflow/src/voice.js"></script>
+  <script src="/scripts/vexflow/src/voicegroup.js"></script>
+  <script src="/scripts/vexflow/src/modifier.js"></script>
+  <script src="/scripts/vexflow/src/modifiercontext.js"></script>
+  <script src="/scripts/vexflow/src/accidental.js"></script>
+  <script src="/scripts/vexflow/src/dot.js"></script>
+  <script src="/scripts/vexflow/src/formatter.js"></script>
+  <script src="/scripts/vexflow/src/stavetie.js"></script>
+  <script src="/scripts/vexflow/src/tabtie.js"></script>
+  <script src="/scripts/vexflow/src/tabslide.js"></script>
+  <script src="/scripts/vexflow/src/bend.js"></script>
+  <script src="/scripts/vexflow/src/vibrato.js"></script>
+  <script src="/scripts/vexflow/src/annotation.js"></script>
+  <script src="/scripts/vexflow/src/articulation.js"></script>
+  <script src="/scripts/vexflow/src/tuning.js"></script>
+  <script src="/scripts/vexflow/src/stavemodifier.js"></script>
+  <script src="/scripts/vexflow/src/keysignature.js"></script>
+  <script src="/scripts/vexflow/src/timesignature.js"></script>
+  <script src="/scripts/vexflow/src/clef.js"></script>
+  <script src="/scripts/vexflow/src/music.js"></script>
+  <script src="/scripts/vexflow/src/keymanager.js"></script>
+  <script src="/scripts/vexflow/src/renderer.js"></script>
+  <script src="/scripts/vexflow/src/raphaelcontext.js"></script>
+  <script src="/scripts/vexflow/src/stavevolta.js"></script>
+  <script src="/scripts/vexflow/src/staverepetition.js"></script>
+  <script src="/scripts/vexflow/src/stavebarline.js"></script>
+  <script src="/scripts/vexflow/src/stavesection.js"></script>
+  <script src="/scripts/vexflow/src/stavehairpin.js"></script>
+  <script src="/scripts/vexflow/src/stavetempo.js"></script>
+  <script src="/scripts/vexflow/src/tremolo.js"></script>
+
+  <!-- VexFlow Compiled Source -->
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+
+  <style type="text/css">
+  	canvas {
+  		background: #eed;
+  		padding: 10px;
+  		border: 10px solid #ddc;
+  	}
+
+  	div.egcode {
+  		font-family: Courier;
+  		font-size: 14px;
+  	}
+  </style>
+
+  <script>
+  var canvas;
+  var ctx;
+  var stave;
+  var renderer;
+  var height;
+  var width;
+  var sWidth;
+  var song1;
+
+  function init() {
+  	canvas = document.getElementById("myCanvas");
+	renderer = new Vex.Flow.Renderer(canvas,
+		Vex.Flow.Renderer.Backends.CANVAS);
+	height = canvas.height;
+	width = canvas.width;
+	sWidth = 400;
+	song1 = false;
+	tSize();
+	tSong();
+	//draw();
+
+  }
+
+  function draw() {
+  	ctx=canvas.getContext("2d");
+	ctx.clearRect(0,0,width,height);
+  	ctx = renderer.getContext();
+  	stave = new Vex.Flow.Stave(10, 0, sWidth);
+  	stave.addClef("treble").setContext(ctx).draw();
+
+  	if(song1) {
+			// Create the notes
+			var notes = [
+			// A quarter-note C.
+			new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" }),
+
+			// A quarter-note D.
+			new Vex.Flow.StaveNote({ keys: ["d/4"], duration: "q" }),
+
+			// A quarter-note rest. Note that the key (b/4) specifies the vertical
+			// position of the rest.
+			new Vex.Flow.StaveNote({ keys: ["b/4"], duration: "qr" }),
+
+			// A C-Major chord.
+			new Vex.Flow.StaveNote({ keys: ["c/4", "e/4", "g/4"], duration: "q" })
+		  ];
+
+		  // Create a voice in 4/4
+		  var voice = new Vex.Flow.Voice({
+			num_beats: 4,
+			beat_value: 4,
+			resolution: Vex.Flow.RESOLUTION
+		  });
+
+		  // Add notes to voice
+		  voice.addTickables(notes);
+
+		  // Format and justify the notes to 500 pixels
+		  var formatter = new Vex.Flow.Formatter().
+			joinVoices([voice]).format([voice], sWidth);
+
+		  // Render voice
+		  voice.draw(ctx, stave);
+  	} else {
+  	 // Create a quarter E, a half D, and a quarter C-Major chord.
+  var notes = [
+    new Vex.Flow.StaveNote({ keys: ["e/5"], duration: "q" }),
+    new Vex.Flow.StaveNote({ keys: ["d/5"], duration: "h" }),
+    new Vex.Flow.StaveNote({ keys: ["c/5", "e/5", "g/5"], duration: "q" })
+  ];
+
+  // Create a second voice, with just one whole note
+  var notes2 = [
+    new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "w" })
+  ];
+
+  // Create a voice in 4/4
+  function create_4_4_voice() {
+    return new Vex.Flow.Voice({
+      num_beats: 4,
+      beat_value: 4,
+      resolution: Vex.Flow.RESOLUTION
+    });
+  }
+
+  // Create voices and add notes to each of them.
+  var voice = create_4_4_voice().addTickables(notes);
+  var voice2 = create_4_4_voice().addTickables(notes2);
+
+  // Format and justify the notes to 500 pixels
+  var formatter = new Vex.Flow.Formatter().
+    joinVoices([voice, voice2]).format([voice, voice2], sWidth);
+
+  // Render voice
+  voice.draw(ctx, stave);
+  voice2.draw(ctx, stave);
+
+  	}
+  }
+
+  function tSize() {
+  	sWidth = ((sWidth + 100)%600)+100;
+  	$('#size').html('Canvas Size: ' + sWidth + 'px');
+  	draw();
+  }
+
+  function tSong() {
+  	song1 = !song1;
+  	if(song1 == true) {
+  		$('#song').html('Song: 1');
+  	} else {
+  		$('#song').html('Song: 2');
+  	}
+  	draw();
+  }
+
+  </script>
+
+</head>
+<body onload="init();">
+<h1>VexTab Demo</h1>
+<canvas id="myCanvas" width="700" height="100">Sorry, you need a better browser.</canvas>
+<button type = "button" onClick="tSong();">Toggle Song</button>
+<button type = "button" onClick="tSize();">Toggle Size</button>
+<button type = "button" onClick="draw();">Render</button>
+<h4 id="song">Song</h4>
+<h4 id="size">Canvas Size</h4>
+
+</body>
+</html>
